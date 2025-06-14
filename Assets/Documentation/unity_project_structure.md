@@ -1,573 +1,482 @@
-# Unity现代化项目目录结构指南
+Unity百家乐项目实施指南
 
-> 基于响应式数据绑定、模块化UI、网络管理、Mock数据、WebGL兼容性的完整项目架构
+基于现有百家乐JavaScript项目重构的Unity网络架构，完美对接后端API，支持Mock/真实环境无缝切换
 
-## 📁 项目目录结构
+🎯 项目概述
+本项目将现有的百家乐JavaScript项目重构为Unity WebGL版本，保持后端API完全不变，实现前端技术栈的现代化升级。
+核心目标：
 
-```
+✅ 完美对接现有百家乐后端API
+✅ 复用现有业务逻辑（useBetting.js、useChips.js等）
+✅ 支持Mock和真实环境无缝切换
+✅ 实现响应式数据绑定和模块化UI
+✅ 优化WebGL性能和Safari兼容性
+
+📋 分阶段实施计划
+Phase 1: 基础架构搭建（第1-2周）
+目标：建立核心架构，确保项目可以编译运行
+1.1 核心架构文件 🔥🔥🔥
+Assets/_Core/Architecture/
+├── ReactiveData.cs           # 响应式数据系统（对应Vue的ref）
+├── ServiceLocator.cs         # 服务定位器（依赖注入容器）
+└── GameDataStore.cs          # 全局数据存储（对应Pinia store）
+作用：提供响应式数据绑定能力，类似Vue的数据响应系统
+1.2 基础数据类型 🔥🔥🔥
+Assets/_Core/Data/Types/
+├── GameParams.cs             # URL游戏参数（table_id, game_type, user_id, token）
+├── UserInfo.cs               # 用户信息（user_id, balance, currency等）
+├── TableInfo.cs              # 台桌信息（id, video_urls, limits等）
+└── BaccaratTypes.cs          # 百家乐专用类型（投注类型、牌面信息等）
+作用：定义与JavaScript项目完全一致的数据结构
+1.3 网络接口定义 🔥🔥
+Assets/_Core/Network/Interfaces/
+├── IGameApiService.cs        # 通用游戏API接口
+├── IBaccaratGameService.cs   # 百家乐专用接口（对应bjlService）
+└── IWebSocketService.cs      # WebSocket接口（对应optimizedSocket）
+作用：定义网络服务契约，支持Mock和真实实现切换
+Phase 1 验收标准：
+
+ Unity项目可以编译通过
+ 基础架构类可以正常实例化
+ 数据类型可以正确序列化/反序列化
+ ReactiveData可以触发变化事件
+
+
+Phase 2: Mock服务实现（第2-3周）
+目标：实现Mock服务，支持离线开发和测试
+2.1 Mock实现 🔥🔥
+Assets/_Core/Network/Mock/
+├── MockBaccaratGameService.cs  # Mock游戏服务（模拟bjlService）
+├── MockWebSocketService.cs     # Mock WebSocket（模拟optimizedSocket）
+└── MockDataGenerator.cs        # Mock数据生成器
+作用：提供模拟数据，支持前端独立开发
+2.2 环境配置 🔥🔥
+Assets/_Core/Data/Config/
+├── EnvironmentConfig.cs        # 环境配置（Development/Testing/Production）
+├── NetworkConfig.cs            # 网络配置（API URLs, WebSocket URLs）
+└── GameConfig.cs               # 游戏配置（投注限额、筹码面值等）
+作用：支持不同环境的配置管理
+2.3 网络管理器 🔥🔥
+Assets/_Core/Network/
+└── NetworkManager.cs           # 网络管理器（统一服务注册和初始化）
+作用：统一管理网络服务，根据环境选择Mock或真实服务
+Phase 2 验收标准：
+
+ Mock服务可以返回符合API格式的模拟数据
+ 环境配置可以正确切换Mock和真实服务
+ NetworkManager可以正确初始化和注册服务
+ 可以模拟完整的投注流程
+
+
+Phase 3: 业务逻辑层（第3-5周）
+目标：实现核心业务逻辑，完美对应JavaScript composables
+3.1 业务管理器 🔥🔥🔥
+Assets/Game/Managers/
+├── BaccaratBettingManager.cs   # 投注管理（对应useBetting.js）
+│   ├── ExecuteClickBet()       # 对应executeClickBet
+│   ├── ConfirmBet()            # 对应confirmBet  
+│   ├── CancelBet()             # 对应cancelBet
+│   └── ClearAfterGameResult()  # 对应clearAfterGameResult
+│
+├── ChipManager.cs              # 筹码管理（对应useChips.js）
+│   ├── ConversionChip()        # 对应conversionChip
+│   ├── FindMaxChip()           # 对应findMaxChip（递归算法）
+│   └── HandleCurrentChip()     # 对应handleCurrentChip
+│
+├── ExemptManager.cs            # 免佣管理（对应useExempt.js）
+│   ├── InitExemptSetting()     # 对应initExemptSetting
+│   ├── ToggleExempt()          # 对应toggleExempt
+│   └── GetExemptForBetting()   # 对应getExemptForBetting
+│
+└── BaccaratGameStateManager.cs # 游戏状态（对应useGameState.js）
+    ├── ProcessGameMessage()    # 对应processGameMessage
+    ├── HandleGameResult()      # 对应handleGameResult
+    ├── SetFlashEffect()        # 对应setFlashEffect
+    └── ShowWinningDisplay()    # 对应showWinningDisplay
+作用：实现与JavaScript版本完全一致的业务逻辑
+3.2 业务数据类型 🔥🔥
+Assets/_Core/Data/Types/
+├── BettingTypes.cs             # 投注相关类型
+│   ├── BaccaratBetTarget       # 投注区域（id, label, betAmount, showChip）
+│   ├── BetRequest              # 投注请求（money, rate_id）
+│   └── BetResult               # 投注结果
+│
+├── ChipTypes.cs                # 筹码相关类型
+│   ├── ChipData                # 筹码数据（val, text, src, betSrc）
+│   └── ChipSelection           # 筹码选择
+│
+├── GameStateTypes.cs           # 游戏状态类型
+│   ├── TableRunInfo            # 桌台运行信息（end_time, run_status）
+│   ├── GameResultMessage       # 开牌结果消息
+│   └── WinningInfo             # 中奖信息
+│
+└── WebSocketMessageTypes.cs    # WebSocket消息类型
+    ├── CountdownMessage        # 倒计时消息
+    ├── GameResultMessage       # 开牌结果消息
+    └── WinningMessage          # 中奖消息
+作用：定义业务逻辑所需的完整数据结构
+Phase 3 验收标准：
+
+ 投注逻辑与JavaScript版本行为完全一致（使用Mock数据）
+ 筹码转换算法结果与JavaScript版本相同
+ 免佣设置可以正确保存和读取本地存储
+ 游戏状态流转正确（等待→投注→开牌→结果）
+ 防抖机制工作正常（300ms投注间隔，1000ms确认间隔）
+
+
+Phase 4: 真实网络服务（第5-7周）
+目标：实现真实的HTTP和WebSocket服务，对接后端API
+4.1 HTTP服务实现 🔥🔥🔥
+Assets/_Core/Network/Http/
+├── HttpClient.cs               # 通用HTTP客户端（对应httpClient.ts）
+│   ├── Get/Post/Put/Delete     # HTTP方法
+│   ├── SetAuthToken()          # Token管理
+│   ├── ResponseInterceptors    # 响应拦截器
+│   └── ErrorHandling           # 错误处理
+│
+├── HttpBaccaratGameService.cs  # 百家乐HTTP服务（对应bjlService）
+│   ├── GetUserInfo()           # 获取用户信息
+│   ├── GetTableInfo()          # 获取台桌信息
+│   ├── PlaceBets()             # 提交投注（/bjl/bet/order）
+│   └── GetBettingHistory()     # 获取投注历史
+│
+└── HttpPlayerDataService.cs    # 玩家数据HTTP服务
+作用：实现与现有后端API的HTTP通信
+4.2 WebSocket服务实现 🔥🔥🔥
+Assets/_Core/Network/WebSocket/
+├── WebSocketManager.cs         # WebSocket连接管理（对应OptimizedSocketManager）
+│   ├── Connect/Disconnect      # 连接管理
+│   ├── AutoReconnect           # 自动重连
+│   ├── Heartbeat               # 心跳检测
+│   └── MessageQueue            # 消息队列
+│
+├── BaccaratWebSocketService.cs # 百家乐WebSocket服务（对应useSocket.js）
+│   ├── InitSocket()            # 初始化连接
+│   ├── HandleMessage()         # 消息处理
+│   └── SendMessage()           # 发送消息
+│
+└── GameMessageDispatcher.cs    # 消息分发器
+    ├── ParseTableInfo()        # 解析桌台信息
+    ├── ParseGameResult()       # 解析开牌结果
+    └── ParseWinningData()      # 解析中奖数据
+作用：实现WebSocket实时通信，接收服务器推送
+4.3 错误处理和重试机制 🔥
+Assets/_Core/Network/Utils/
+├── NetworkErrorHandler.cs     # 网络错误处理
+├── RetryManager.cs            # 重试机制
+└── ConnectionMonitor.cs       # 连接监控
+作用：提供稳定的网络服务
+Phase 4 验收标准：
+
+ 可以成功连接真实的后端API
+ HTTP请求格式与现有API完全匹配
+ WebSocket可以接收和正确解析真实消息
+ Token错误处理与JavaScript版本一致
+ 网络错误和重连机制工作正常
+ 完整投注流程可以成功执行
+
+
+Phase 5: UI框架和生成器（第7-9周）
+目标：实现响应式UI和模块化生成器
+5.1 响应式UI框架 🔥🔥
+Assets/UI/Framework/
+├── ReactiveText.cs             # 响应式文本组件
+│   └── 绑定ReactiveData<int/string> 自动更新显示
+│
+├── ReactiveImage.cs            # 响应式图片组件
+│   └── 绑定ReactiveData<Sprite> 自动更新图片
+│
+├── ReactiveButton.cs           # 响应式按钮组件
+│   └── 绑定ReactiveData<bool> 控制可点击状态
+│
+└── UIUpdateManager.cs          # UI更新管理器
+    └── 统一管理UI组件的数据绑定和更新
+作用：实现数据变化时UI自动更新，类似Vue的数据绑定
+5.2 UI生成器 🔥
+Assets/UI/Generators/
+├── UIGeneratorBase.cs          # UI生成器基类
+├── BaccaratTableGenerator.cs   # 百家乐桌台生成器
+│   ├── GenerateBettingAreas()  # 生成投注区域（庄、闲、和、对子）
+│   ├── GenerateChipDisplay()   # 生成筹码显示
+│   └── GenerateVideoArea()     # 生成视频区域
+│
+├── ChipAreaGenerator.cs        # 筹码区域生成器
+│   ├── GenerateChipButtons()   # 生成筹码选择按钮
+│   └── GenerateChipStack()     # 生成筹码堆叠显示
+│
+└── BettingAreaGenerator.cs     # 投注区域生成器
+    ├── CreateBetTarget()       # 创建投注目标
+    ├── SetupChipDisplay()      # 设置筹码显示
+    └── SetupFlashEffect()      # 设置闪烁效果
+作用：通过代码动态生成UI，支持不同设备适配
+5.3 UI组件库 🔥
+Assets/UI/Components/
+├── BaccaratBetButton.cs        # 百家乐投注按钮
+├── ChipButton.cs               # 筹码按钮
+├── TimerDisplay.cs             # 倒计时显示
+├── BalanceDisplay.cs           # 余额显示
+└── WinningPopup.cs             # 中奖弹窗
+作用：提供可复用的UI组件
+Phase 5 验收标准：
+
+ UI可以响应数据变化自动更新
+ 可以通过代码动态生成完整的游戏界面
+ UI组件与业务逻辑完全解耦
+ 支持不同分辨率和设备的适配
+ 筹码显示和投注区域与JavaScript版本视觉一致
+
+
+Phase 6: 音频和效果（第9-10周）
+目标：实现音频管理和视觉效果
+6.1 音频系统 🔥
+Assets/_Core/Audio/
+├── AudioManager.cs             # 音频管理器
+│   ├── PlayBetSound()          # 播放下注音效
+│   ├── PlayConfirmSound()      # 播放确认音效
+│   ├── PlayWinSound()          # 播放中奖音效
+│   └── PlayOpenCardSequence() # 播放开牌音效序列
+│
+├── BaccaratAudioController.cs  # 百家乐音频控制器
+│   ├── PlayStartBetSound()     # 播放开始下注音效
+│   ├── PlayStopBetSound()      # 播放停止下注音效
+│   └── PlayWinSoundByAmount()  # 根据金额播放中奖音效
+│
+└── SafariAudioManager.cs       # Safari兼容音频
+    └── 处理Safari浏览器的音频播放限制
+作用：提供完整的音频体验，与JavaScript版本一致
+6.2 视觉效果 🔥
+Assets/UI/Effects/
+├── FlashEffect.cs              # 闪烁效果（开牌时中奖区域闪烁）
+├── ChipAnimation.cs            # 筹码动画（下注时筹码飞入动画）
+├── WinningEffect.cs            # 中奖特效（粒子效果、光效）
+└── CountdownAnimation.cs       # 倒计时动画
+作用：提供视觉反馈，提升用户体验
+Phase 6 验收标准：
+
+ 音频可以正常播放（包括Safari兼容）
+ 视觉效果流畅且符合游戏需求
+ 音效触发时机与JavaScript版本一致
+ 闪烁效果与开牌结果正确对应
+
+
+Phase 7: WebGL优化和部署（第10-11周）
+目标：优化WebGL性能和部署配置
+7.1 WebGL优化 🔥
+Assets/_Core/Utils/
+├── WebGLUtils.cs               # WebGL工具类
+│   ├── ParseUrlParams()        # 解析URL参数
+│   ├── PostMessageToParent()   # 与父页面通信
+│   └── DetectBrowser()         # 检测浏览器类型
+│
+├── SafariOptimizer.cs          # Safari优化
+│   ├── OptimizeMemoryUsage()   # 内存优化
+│   ├── HandleTouchEvents()     # 触摸事件优化
+│   └── AudioContextFix()       # 音频上下文修复
+│
+└── PerformanceMonitor.cs       # 性能监控
+    ├── MonitorFrameRate()      # 监控帧率
+    ├── MonitorMemoryUsage()    # 监控内存使用
+    └── ReportPerformance()     # 性能报告
+作用：确保WebGL版本性能和兼容性
+7.2 构建配置 🔥
+Assets/Scripts/Editor/
+├── WebGLBuildProcessor.cs      # WebGL构建处理器
+│   ├── OptimizeForSafari()     # Safari优化设置
+│   ├── CompressAssets()        # 资源压缩
+│   └── GenerateBuildReport()   # 构建报告
+│
+└── AssetProcessor.cs           # 资源处理器
+    ├── OptimizeTextures()      # 纹理优化
+    ├── CompressAudio()         # 音频压缩
+    └── MinifyCode()            # 代码压缩
+作用：自动化构建优化
+7.3 WebGL模板 🔥
+WebGLTemplates/BaccaratTemplate/
+├── index.html                  # 自定义模板
+├── TemplateData/
+│   ├── style.css               # 样式（响应式布局）
+│   ├── safari-compatibility.js # Safari兼容脚本
+│   ├── unity-bridge.js         # Unity通信桥接
+│   └── error-handler.js        # 错误处理
+└── Assets/
+    ├── favicon.ico             # 网站图标
+    └── loading-spinner.svg     # 加载动画
+作用：提供优化的WebGL运行环境
+Phase 7 验收标准：
+
+ WebGL构建可以正常运行
+ Safari浏览器兼容性良好
+ 性能满足游戏需求（60fps）
+ 资源加载优化，启动时间合理
+ 可以正确解析URL参数并初始化游戏
+
+
+📊 项目文件创建清单
+优先级说明
+
+🔥🔥🔥 = 核心文件，必须优先创建
+🔥🔥 = 重要文件，早期需要
+🔥 = 普通文件，可以延后
+
+完整文件清单
 Assets/
-├── 📁 _Core/                          # 核心系统（下划线开头，排在最前面）
-│   ├── 📁 Architecture/               # 架构相关
-│   │   ├── ReactiveData.cs           # 响应式数据系统
-│   │   ├── ServiceLocator.cs         # 服务定位器
-│   │   ├── GameDataStore.cs          # 全局数据存储
-│   │   └── EventSystem.cs            # 事件系统
+├── _Core/                              # 核心系统
+│   ├── Architecture/                   # 🔥🔥🔥 架构核心
+│   │   ├── ReactiveData.cs
+│   │   ├── ServiceLocator.cs
+│   │   └── GameDataStore.cs
 │   │
-│   ├── 📁 Network/                    # 网络系统
-│   │   ├── Interfaces/               # 接口定义
-│   │   │   ├── IPlayerDataService.cs
-│   │   │   └── IGameService.cs
-│   │   ├── Mock/                     # Mock实现
-│   │   │   ├── MockPlayerDataService.cs
-│   │   │   └── MockGameService.cs
-│   │   ├── Http/                     # HTTP实现
-│   │   │   ├── HttpPlayerDataService.cs
-│   │   │   └── HttpGameService.cs
-│   │   ├── WebSocket/                # WebSocket实现
+│   ├── Network/                        # 网络系统
+│   │   ├── Interfaces/                 # 🔥🔥 接口定义
+│   │   │   ├── IGameApiService.cs
+│   │   │   ├── IBaccaratGameService.cs
+│   │   │   └── IWebSocketService.cs
+│   │   │
+│   │   ├── Mock/                       # 🔥🔥 Mock实现
+│   │   │   ├── MockBaccaratGameService.cs
+│   │   │   ├── MockWebSocketService.cs
+│   │   │   └── MockDataGenerator.cs
+│   │   │
+│   │   ├── Http/                       # 🔥🔥🔥 HTTP实现
+│   │   │   ├── HttpClient.cs
+│   │   │   ├── HttpBaccaratGameService.cs
+│   │   │   └── HttpPlayerDataService.cs
+│   │   │
+│   │   ├── WebSocket/                  # 🔥🔥🔥 WebSocket实现
 │   │   │   ├── WebSocketManager.cs
-│   │   │   └── GameWebSocketHandler.cs
-│   │   └── NetworkManager.cs         # 网络管理器
+│   │   │   ├── BaccaratWebSocketService.cs
+│   │   │   └── GameMessageDispatcher.cs
+│   │   │
+│   │   ├── Utils/                      # 🔥 网络工具
+│   │   │   ├── NetworkErrorHandler.cs
+│   │   │   ├── RetryManager.cs
+│   │   │   └── ConnectionMonitor.cs
+│   │   │
+│   │   └── NetworkManager.cs           # 🔥🔥 网络管理器
 │   │
-│   ├── 📁 Data/                       # 数据定义
-│   │   ├── Types/                    # 数据类型（类似TypeScript的types）
-│   │   │   ├── PlayerData.cs
-│   │   │   ├── GameData.cs
-│   │   │   ├── NetworkMessage.cs
-│   │   │   └── Enums.cs
-│   │   ├── Validators/               # 数据验证器
-│   │   │   ├── DataValidator.cs
-│   │   │   └── ValidationResult.cs
-│   │   └── Config/                   # 配置文件
-│   │       ├── EnvironmentConfig.cs
-│   │       ├── GameConfig.cs
-│   │       └── NetworkConfig.cs
+│   ├── Data/                           # 数据定义
+│   │   ├── Types/                      # 🔥🔥🔥 数据类型
+│   │   │   ├── GameParams.cs
+│   │   │   ├── UserInfo.cs
+│   │   │   ├── TableInfo.cs
+│   │   │   ├── BaccaratTypes.cs
+│   │   │   ├── BettingTypes.cs
+│   │   │   ├── ChipTypes.cs
+│   │   │   ├── GameStateTypes.cs
+│   │   │   └── WebSocketMessageTypes.cs
+│   │   │
+│   │   ├── Config/                     # 🔥🔥 配置文件
+│   │   │   ├── EnvironmentConfig.cs
+│   │   │   ├── NetworkConfig.cs
+│   │   │   └── GameConfig.cs
+│   │   │
+│   │   └── Validators/                 # 🔥 数据验证
+│   │       ├── DataValidator.cs
+│   │       └── ValidationResult.cs
 │   │
-│   ├── 📁 Audio/                      # 音频系统
+│   ├── Audio/                          # 🔥 音频系统
 │   │   ├── AudioManager.cs
-│   │   ├── SoundClip.cs
-│   │   ├── MusicTrack.cs
-│   │   └── SafariAudioManager.cs     # Safari音频兼容
+│   │   ├── BaccaratAudioController.cs
+│   │   └── SafariAudioManager.cs
 │   │
-│   └── 📁 Utils/                      # 工具类
-│       ├── UIUtils.cs
+│   └── Utils/                          # 🔥 工具类
 │       ├── WebGLUtils.cs
 │       ├── SafariOptimizer.cs
 │       └── PerformanceMonitor.cs
 │
-├── 📁 Game/                           # 游戏逻辑
-│   ├── 📁 Managers/                   # 游戏管理器
-│   │   ├── GameManager.cs
-│   │   ├── LevelManager.cs
-│   │   ├── PlayerManager.cs
-│   │   └── ScoreManager.cs
+├── Game/                               # 游戏逻辑
+│   ├── Managers/                       # 🔥🔥🔥 业务管理器
+│   │   ├── BaccaratBettingManager.cs
+│   │   ├── ChipManager.cs
+│   │   ├── ExemptManager.cs
+│   │   └── BaccaratGameStateManager.cs
 │   │
-│   ├── 📁 Logic/                      # 游戏逻辑
+│   ├── Logic/                          # 🔥 游戏逻辑
 │   │   ├── BaccaratLogic.cs
 │   │   ├── CardSystem.cs
-│   │   ├── BettingSystem.cs
 │   │   └── GameRules.cs
 │   │
-│   ├── 📁 Entities/                   # 游戏实体
-│   │   ├── Player.cs
-│   │   ├── Card.cs
-│   │   ├── Room.cs
-│   │   └── Bet.cs
-│   │
-│   └── 📁 States/                     # 游戏状态
-│       ├── GameState.cs
-│       ├── MenuState.cs
-│       ├── PlayingState.cs
-│       └── GameOverState.cs
+│   └── Entities/                       # 🔥 游戏实体
+│       ├── Player.cs
+│       ├── Card.cs
+│       └── Bet.cs
 │
-├── 📁 UI/                             # UI系统
-│   ├── 📁 Framework/                  # UI框架
-│   │   ├── ReactiveText.cs           # 响应式UI组件
+├── UI/                                 # UI系统
+│   ├── Framework/                      # 🔥🔥 UI框架
+│   │   ├── ReactiveText.cs
 │   │   ├── ReactiveImage.cs
-│   │   ├── ReactiveSlider.cs
-│   │   ├── UIUpdateManager.cs
-│   │   └── SmartBindingComponent.cs
+│   │   ├── ReactiveButton.cs
+│   │   └── UIUpdateManager.cs
 │   │
-│   ├── 📁 Generators/                 # 模块化UI生成器
+│   ├── Generators/                     # 🔥 UI生成器
 │   │   ├── UIGeneratorBase.cs
-│   │   ├── HistoryAreaGenerator.cs
-│   │   ├── BettingAreaGenerator.cs
+│   │   ├── BaccaratTableGenerator.cs
 │   │   ├── ChipAreaGenerator.cs
-│   │   ├── ControlAreaGenerator.cs
-│   │   └── ModularBaccaratUIBuilder.cs
+│   │   └── BettingAreaGenerator.cs
 │   │
-│   ├── 📁 Panels/                     # UI面板
-│   │   ├── MainMenuPanel.cs
-│   │   ├── GamePanel.cs
-│   │   ├── SettingsPanel.cs
-│   │   ├── PlayerInfoPanel.cs
-│   │   └── ResultPanel.cs
-│   │
-│   ├── 📁 Components/                 # UI组件
-│   │   ├── CustomButton.cs
-│   │   ├── CoinDisplay.cs
+│   ├── Components/                     # 🔥 UI组件
+│   │   ├── BaccaratBetButton.cs
+│   │   ├── ChipButton.cs
 │   │   ├── TimerDisplay.cs
-│   │   ├── PlayerAvatar.cs
-│   │   └── ChipButton.cs
+│   │   ├── BalanceDisplay.cs
+│   │   └── WinningPopup.cs
 │   │
-│   └── 📁 Animations/                 # UI动画
-│       ├── UITweener.cs
-│       ├── FadeAnimation.cs
-│       ├── SlideAnimation.cs
-│       └── PulseAnimation.cs
+│   └── Effects/                        # 🔥 视觉效果
+│       ├── FlashEffect.cs
+│       ├── ChipAnimation.cs
+│       ├── WinningEffect.cs
+│       └── CountdownAnimation.cs
 │
-├── 📁 Resources/                      # 资源文件
-│   ├── 📁 Audio/
-│   │   ├── 📁 Music/
-│   │   │   ├── BackgroundMusic.ogg
-│   │   │   └── MenuMusic.ogg
-│   │   ├── 📁 SFX/
-│   │   │   ├── ButtonClick.wav
-│   │   │   ├── CardFlip.wav
-│   │   │   ├── ChipPlace.wav
-│   │   │   └── WinSound.wav
-│   │   └── 📁 Voice/
-│   │       └── GameAnnouncements/
+├── Scripts/                            # 其他脚本
+│   ├── Editor/                         # 🔥 编辑器扩展
+│   │   ├── WebGLBuildProcessor.cs
+│   │   └── AssetProcessor.cs
 │   │
-│   ├── 📁 Textures/
-│   │   ├── 📁 UI/
-│   │   │   ├── Buttons/
-│   │   │   ├── Backgrounds/
-│   │   │   └── Icons/
-│   │   ├── 📁 Cards/
-│   │   │   ├── CardFaces/
-│   │   │   └── CardBacks/
-│   │   └── 📁 Effects/
-│   │       ├── Particles/
-│   │       └── Animations/
-│   │
-│   ├── 📁 Prefabs/
-│   │   ├── 📁 UI/
-│   │   │   ├── UICanvas.prefab
-│   │   │   ├── HistoryItemPrefab.prefab
-│   │   │   └── PlayerInfoPrefab.prefab
-│   │   ├── 📁 Game/
-│   │   │   ├── Card.prefab
-│   │   │   ├── Chip.prefab
-│   │   │   └── Table.prefab
-│   │   └── 📁 Effects/
-│   │       ├── WinEffect.prefab
-│   │       └── CardShuffleEffect.prefab
-│   │
-│   └── 📁 Fonts/
-│       ├── MainFont.ttf
-│       └── NumberFont.ttf
-│
-├── 📁 Scenes/                         # 场景文件
-│   ├── 📁 Development/                # 开发场景
-│   │   ├── TestScene.unity
-│   │   ├── UITestScene.unity
-│   │   └── NetworkTestScene.unity
-│   ├── MainMenu.unity
-│   ├── GameScene.unity
-│   └── LoadingScene.unity
-│
-├── 📁 Scripts/                        # 其他脚本
-│   ├── 📁 Editor/                     # 编辑器扩展
-│   │   ├── BuildProcessor.cs         # 构建处理器
-│   │   ├── WebGLBuildProcessor.cs    # WebGL构建优化
-│   │   ├── UIGeneratorEditor.cs      # UI生成器编辑器
-│   │   └── AssetProcessor.cs         # 资源处理器
-│   │
-│   ├── 📁 ThirdParty/                 # 第三方代码
-│   │   ├── 📁 WebGL/
-│   │   │   ├── BrowserDetection.cs
-│   │   │   └── FullscreenManager.cs
-│   │   └── 📁 Networking/
-│   │       └── SimpleJSON.cs
-│   │
-│   └── 📁 Testing/                    # 测试相关
+│   └── Testing/                        # 🔥 测试相关
 │       ├── MockDataGenerator.cs
-│       ├── NetworkTester.cs
-│       └── UITester.cs
+│       └── NetworkTester.cs
 │
-├── 📁 StreamingAssets/                # 流式资源
-│   ├── 📁 Config/
-│   │   ├── GameConfig.json
-│   │   ├── NetworkConfig.json
-│   │   └── LocalizationData.json
-│   └── 📁 Data/
-│       └── GameData.json
+├── Scenes/                             # 场景文件
+│   ├── Development/                    # 🔥 开发场景
+│   │   ├── TestScene.unity
+│   │   └── NetworkTestScene.unity
+│   ├── MainMenu.unity                  # 🔥🔥
+│   └── GameScene.unity                 # 🔥🔥🔥
 │
-WebGLTemplates/
-└── 📁 MobileTemplate/                    # 移动端专用模板
-    ├── index.html                        # 主模板文件
-    ├── thumbnail.png                     # Unity编辑器预览图
-    │
-    ├── 📁 TemplateData/                  # 模板脚本和样式
-    │   ├── style.css                     # 移动端主样式
-    │   ├── loading.css                   # 加载动画样式
-    │   ├── mobile-core.js                # 移动端核心功能
-    │   ├── viewport-handler.js           # 视口和工具栏处理
-    │   ├── safari-support.js             # Safari浏览器支持
-    │   ├── chrome-support.js             # Chrome浏览器支持
-    │   ├── touch-manager.js              # 触摸事件管理
-    │   ├── unity-bridge.js               # Unity通信桥接
-    │   └── error-handler.js              # 错误处理
-    │
-    └── 📁 Assets/                        # 静态资源
-        ├── 📁 icons/
-        │   ├── favicon.ico               # 网站图标
-        │   ├── apple-touch-icon.png      # iOS桌面图标
-        │   ├── android-chrome-192.png    # Android图标
-        │   └── manifest.json             # PWA配置
-        │
-        ├── 📁 images/
-        │   ├── loading-bg.jpg            # 加载背景
-        │   ├── loading-spinner.svg       # 加载动画
-        │   ├── error-icon.svg            # 错误图标
-        │   └── game-logo.png             # 游戏Logo
-        │
-        └── 📁 sounds/                    # 音效文件（可选）
-            ├── loading.mp3               # 加载音效
-            └── error.mp3                 # 错误提示音
-│
-└── 📁 Documentation/                  # 项目文档
-    ├── unity_project_structure.md                        # API文档
+└── StreamingAssets/                    # 🔥 流式资源
+    └── Config/
+        ├── GameConfig.json
+        └── NetworkConfig.json
 
-```
+WebGLTemplates/                         # 🔥 WebGL模板
+└── BaccaratTemplate/
+    ├── index.html
+    ├── TemplateData/
+    │   ├── style.css
+    │   ├── safari-compatibility.js
+    │   ├── unity-bridge.js
+    │   └── error-handler.js
+    └── Assets/
+        ├── favicon.ico
+        └── loading-spinner.svg
+🚀 开始实施建议
+第一步：创建基础架构（本周）
 
-## 🎯 设计理念
+创建Unity新项目
+按Phase 1清单创建核心架构文件
+实现ReactiveData基础功能
+设置基础的项目结构
 
-### 1. 按功能分层
-- **_Core/** - 基础架构和通用系统
-- **Game/** - 具体游戏逻辑
-- **UI/** - 界面相关，完全模块化
-- **Resources/** - 按类型组织资源
+第二步：实现Mock服务（下周）
 
-### 2. 关注点分离
-```
-数据流向：
-WebSocketManager → GameDataStore → ReactiveData → UI Components
-NetworkService → DataValidator → GameLogic → StateManager
-```
+按Phase 2清单创建Mock相关文件
+实现基础的Mock数据生成
+测试服务注册和环境切换
 
-### 3. 开发友好
-- **Editor/** - 提升开发效率的工具
-- **Testing/** - 测试和Mock数据
-- **Documentation/** - 完整的项目文档
+第三步：业务逻辑迁移
 
-### 4. 部署优化
-- **WebGLTemplates/** - 针对不同平台的模板
-- **StreamingAssets/** - 可热更新的配置
-- **BuildProcessor** - 自动化构建优化
+逐个迁移JavaScript composables到C#
+确保业务逻辑与原版本一致
+使用Mock数据测试所有功能
 
-## 🚀 核心组件说明
-
-### _Core/Architecture/ - 架构核心
-
-#### ReactiveData.cs
-```csharp
-// 响应式数据系统，类似Vue的reactive
-public class ReactiveData<T> 
-{
-    private T _value;
-    public event Action<T> OnValueChanged;
-    
-    public T Value 
-    {
-        get => _value;
-        set 
-        {
-            if (!EqualityComparer<T>.Default.Equals(_value, value)) 
-            {
-                _value = value;
-                OnValueChanged?.Invoke(_value);
-            }
-        }
-    }
-}
-```
-
-#### ServiceLocator.cs
-```csharp
-// 服务定位器，管理依赖注入
-public class ServiceLocator : MonoBehaviour 
-{
-    public static ServiceLocator Instance { get; private set; }
-    
-    public IPlayerDataService PlayerDataService { get; private set; }
-    public IGameService GameService { get; private set; }
-    
-    void Awake() 
-    {
-        if (Instance == null) 
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            InitializeServices();
-        }
-    }
-}
-```
-
-#### GameDataStore.cs
-```csharp
-// 全局数据存储，类似Vuex Store
-public class GameDataStore : MonoBehaviour 
-{
-    public static GameDataStore Instance { get; private set; }
-    
-    [Header("玩家数据")]
-    public ReactiveData<int> PlayerCoins = new ReactiveData<int>();
-    public ReactiveData<int> PlayerLevel = new ReactiveData<int>();
-    
-    [Header("游戏数据")]
-    public ReactiveData<string> GameStatus = new ReactiveData<string>();
-    public ReactiveData<List<Player>> RoomPlayers = new ReactiveData<List<Player>>();
-}
-```
-
-### _Core/Network/ - 网络系统
-
-#### 接口定义
-```csharp
-// IPlayerDataService.cs - 玩家数据服务接口
-public interface IPlayerDataService 
-{
-    Task<PlayerData> GetPlayerInfoAsync();
-    Task<bool> UpdatePlayerCoinsAsync(int coins);
-    Task<List<GameRoom>> GetGameRoomsAsync();
-}
-
-// IGameService.cs - 游戏服务接口
-public interface IGameService 
-{
-    Task<GameStatus> JoinRoomAsync(string roomId);
-    Task<bool> StartGameAsync();
-    Task<GameResult> SubmitMoveAsync(GameMove move);
-}
-```
-
-#### Mock实现
-```csharp
-// MockPlayerDataService.cs - 开发测试用Mock数据
-public class MockPlayerDataService : IPlayerDataService 
-{
-    public async Task<PlayerData> GetPlayerInfoAsync() 
-    {
-        await Task.Delay(Random.Range(100, 500)); // 模拟网络延迟
-        return mockPlayerData;
-    }
-}
-```
-
-#### HTTP实现
-```csharp
-// HttpPlayerDataService.cs - 生产环境HTTP实现
-public class HttpPlayerDataService : IPlayerDataService 
-{
-    public async Task<PlayerData> GetPlayerInfoAsync() 
-    {
-        var response = await httpClient.GetAsync($"{baseUrl}/api/player/info");
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonUtility.FromJson<PlayerData>(json);
-    }
-}
-```
-
-### _Core/Data/Types/ - 数据类型定义
-
-#### PlayerData.cs
-```csharp
-// 类似TypeScript的类型定义
-[System.Serializable]
-public class PlayerData 
-{
-    [Header("基础信息")]
-    public string playerId;
-    public string playerName;
-    
-    [Header("游戏数据")]
-    [Range(1, 999)]
-    public int level = 1;
-    
-    [Min(0)]
-    public int coins = 0;
-    
-    // 数据验证
-    public bool IsValid() 
-    {
-        return !string.IsNullOrEmpty(playerId) && 
-               level > 0 && coins >= 0;
-    }
-}
-```
-
-### UI/Framework/ - 响应式UI框架
-
-#### ReactiveText.cs
-```csharp
-// 响应式UI组件，数据变化自动更新
-public class ReactiveText : MonoBehaviour 
-{
-    public ReactiveData<int> intDataSource;
-    public string format = "{0}";
-    
-    void Start() 
-    {
-        var textComponent = GetComponent<Text>();
-        intDataSource?.OnValueChanged += (value) => 
-            textComponent.text = string.Format(format, value);
-    }
-}
-```
-
-### UI/Generators/ - 模块化UI生成器
-
-#### BettingAreaGenerator.cs
-```csharp
-// 投注区域生成器
-public class BettingAreaGenerator : MonoBehaviour
-{
-    public BettingAreaSettings settings = new BettingAreaSettings();
-    
-    [ContextMenu("生成投注区域")]
-    public GameObject GenerateBettingArea(Transform parent = null)
-    {
-        // 创建闲家、和局、庄家三个按钮
-        // 完全通过代码生成，可配置样式
-    }
-}
-```
-
-## 🔄 项目启动流程
-
-```csharp
-// 1. ServiceLocator初始化环境
-ServiceLocator.Instance.InitializeEnvironment();
-
-// 2. 根据环境加载对应服务
-if (isDevelopment) {
-    playerService = new MockPlayerDataService();
-} else {
-    playerService = new HttpPlayerDataService();
-}
-
-// 3. 初始化响应式数据
-GameDataStore.Instance.Initialize();
-
-// 4. 加载UI（完全模块化）
-ModularBaccaratUIBuilder.Instance.GenerateCompleteUI();
-
-// 5. 启动游戏逻辑
-GameManager.Instance.StartGame();
-```
-
-## 🌐 环境配置管理
-
-### EnvironmentConfig.cs
-```csharp
-public enum EnvironmentType 
-{
-    Development,  // 开发环境（使用Mock）
-    Testing,      // 测试环境（使用测试服务器）
-    Production    // 生产环境（使用正式服务器）
-}
-
-[System.Serializable]
-public class EnvironmentConfig 
-{
-    public EnvironmentType environment = EnvironmentType.Development;
-    public string apiBaseUrl = "https://api.yourgame.com";
-    public string websocketUrl = "wss://ws.yourgame.com";
-    public bool enableDebugLog = true;
-    public bool useMockData = true;
-}
-```
-
-## 📱 WebGL特殊支持
-
-### WebGLTemplates/BaccaratTemplate/
-- **index.html** - 自定义WebGL模板
-- **safari-compatibility.js** - Safari浏览器兼容
-- **fullscreen-manager.js** - 全屏管理
-- **style.css** - 响应式样式
-
-### 特性支持
-- ✅ **URL参数解析** - 支持通过URL传递游戏参数
-- ✅ **iframe嵌入** - 完美支持在其他网站中嵌入
-- ✅ **Safari兼容** - 特殊处理Safari的兼容性问题
-- ✅ **WebRTC直播** - 支持游戏直播功能
-- ✅ **双向通信** - 与父页面的消息通信
-
-## 📋 开发工作流
-
-### 1. 开发阶段
-```bash
-# 使用Mock数据
-EnvironmentConfig.environment = EnvironmentType.Development
-```
-
-### 2. 测试阶段
-```bash
-# 切换到测试服务器
-EnvironmentConfig.environment = EnvironmentType.Testing
-```
-
-### 3. 生产部署
-```bash
-# 切换到生产环境
-EnvironmentConfig.environment = EnvironmentType.Production
-```
-
-## 🔧 构建优化
-
-### Scripts/Editor/WebGLBuildProcessor.cs
-```csharp
-public class WebGLBuildProcessor 
-{
-    [MenuItem("Build/构建WebGL优化版")]
-    static void BuildOptimizedWebGL()
-    {
-        // Safari内存优化
-        PlayerSettings.WebGL.memorySize = 256;
-        
-        // 压缩优化
-        PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
-        
-        // 性能优化
-        PlayerSettings.WebGL.powerPreference = WebGLPowerPreference.HighPerformance;
-        
-        BuildPipeline.BuildPlayer(...);
-    }
-}
-```
-
-## 📚 文档结构
-
-### Documentation/
-- **API.md** - 完整的API接口文档
-- **Architecture.md** - 架构设计说明
-- **BuildGuide.md** - 构建和部署指南
-- **WebGLOptimization.md** - WebGL性能优化指南
-
-## ⚡ 核心优势
-
-### 开发效率
-- ✅ **响应式数据** - 数据变化UI自动更新
-- ✅ **模块化UI** - 组件化开发，高度复用
-- ✅ **Mock数据** - 前后端分离，独立开发
-- ✅ **类型安全** - 严格的数据类型定义
-
-### 团队协作
-- ✅ **关注点分离** - 各层职责清晰
-- ✅ **版本控制友好** - 脚本生成减少冲突
-- ✅ **统一架构** - 一致的开发模式
-- ✅ **完整文档** - 降低学习成本
-
-### 扩展性
-- ✅ **插件化架构** - 功能模块独立
-- ✅ **环境隔离** - 多环境无缝切换
-- ✅ **平台适配** - 统一代码多平台部署
-- ✅ **性能优化** - 针对性优化策略
-
-这个目录结构可以完美支撑一个现代化的Unity项目，具备前端框架的所有优势！🎮✨
-
----
-
-*最后更新：2025年6月14日*
+这个实施指南确保了项目的有序进行，同时保持了与现有百家乐项目的完美兼容！
