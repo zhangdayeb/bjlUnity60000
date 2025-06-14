@@ -193,22 +193,42 @@ Assets/
 │   └── 📁 Data/
 │       └── GameData.json
 │
-├── 📁 WebGLTemplates/                 # WebGL模板
-│   ├── 📁 BaccaratTemplate/
-│   │   ├── index.html
-│   │   ├── TemplateData/
-│   │   │   ├── style.css
-│   │   │   ├── safari-compatibility.js
-│   │   │   └── fullscreen-manager.js
-│   │   └── thumbnail.png
-│   └── 📁 MobileTemplate/
-│       └── index.html
+WebGLTemplates/
+└── 📁 MobileTemplate/                    # 移动端专用模板
+    ├── index.html                        # 主模板文件
+    ├── thumbnail.png                     # Unity编辑器预览图
+    │
+    ├── 📁 TemplateData/                  # 模板脚本和样式
+    │   ├── style.css                     # 移动端主样式
+    │   ├── loading.css                   # 加载动画样式
+    │   ├── mobile-core.js                # 移动端核心功能
+    │   ├── viewport-handler.js           # 视口和工具栏处理
+    │   ├── safari-support.js             # Safari浏览器支持
+    │   ├── chrome-support.js             # Chrome浏览器支持
+    │   ├── touch-manager.js              # 触摸事件管理
+    │   ├── unity-bridge.js               # Unity通信桥接
+    │   └── error-handler.js              # 错误处理
+    │
+    └── 📁 Assets/                        # 静态资源
+        ├── 📁 icons/
+        │   ├── favicon.ico               # 网站图标
+        │   ├── apple-touch-icon.png      # iOS桌面图标
+        │   ├── android-chrome-192.png    # Android图标
+        │   └── manifest.json             # PWA配置
+        │
+        ├── 📁 images/
+        │   ├── loading-bg.jpg            # 加载背景
+        │   ├── loading-spinner.svg       # 加载动画
+        │   ├── error-icon.svg            # 错误图标
+        │   └── game-logo.png             # 游戏Logo
+        │
+        └── 📁 sounds/                    # 音效文件（可选）
+            ├── loading.mp3               # 加载音效
+            └── error.mp3                 # 错误提示音
 │
 └── 📁 Documentation/                  # 项目文档
-    ├── API.md                        # API文档
-    ├── Architecture.md               # 架构说明
-    ├── BuildGuide.md                 # 构建指南
-    └── WebGLOptimization.md          # WebGL优化指南
+    ├── unity_project_structure.md                        # API文档
+
 ```
 
 ## 🎯 设计理念
