@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    
+    <title>百家乐游戏</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="专业的在线百家乐游戏平台，支持实时视频直播和多种投注玩法">
+    <meta name="keywords" content="百家乐,在线游戏,真人娱乐,WebGL游戏">
+    <meta name="author" content="Baccarat Game Team">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="百家乐游戏">
+    <meta property="og:description" content="专业的在线百家乐游戏平台">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{{ UNITY_CUSTOM_WEBSITE_URL }}}">
+    <meta property="og:image" content="TemplateData/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="Assets/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="Assets/favicon.ico" type="image/x-icon">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="TemplateData/style.css" as="style">
+    <link rel="preload" href="TemplateData/unity-bridge.js" as="script">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="TemplateData/style.css">
+    
+    <!-- WebGL Detection -->
+    <script>
+        // WebGL支持检测
+        function checkWebGLSupport() {
+            try {
+                var canvas = document.createElement('canvas');
+                var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                return !!gl;
+            } catch(e) {
+                return false;
+            }
+        }
+        
+        // 如果不支持WebGL，显示错误页面
+        if (!checkWebGLSupport()) {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.innerHTML = `
+                    <div class="webgl-not-supported">
+                        <h2>您的浏览器不支持WebGL</h2>
+                        <p>请使用支持WebGL的现代浏览器访问本游戏</p>
+                        <p>推荐浏览器：Chrome、Firefox、Safari、Edge</p>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <!-- 加载屏幕 -->
+    <div id="unity-container" class="unity-desktop">
+        <!-- 游戏画布 -->
+        <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}} tabindex="-1"></canvas>
+        
+        <!-- 加载界面 -->
+        <div id="unity-loading-bar">
+            <div id="unity-logo">
+                <img src="Assets/logo.png" alt="游戏Logo" onerror="this.style.display='none'">
+            </div>
+            <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
+            </div>
+            <div id="unity-progress-text">加载中...</div>
+        </div>
+        
+        <!-- 全屏按钮 -->
+        <div id="unity-fullscreen-button" title="全屏模式" style="display: none;"></div>
+    </div>
+    
+    <!-- 错误提示界面 -->
+    <div id="error-container" style="display: none;">
+        <div class="error-content">
+            <h2>游戏加载失败</h2>
+            <p id="error-message">请检查网络连接后重试</p>
+            <button id="retry-button" onclick="window.location.reload()">重新加载</button>
+        </div>
+    </div>
+    
+    <!-- 不支持移动端提示 -->
+    <div id="mobile-warning" class="mobile-only">
+        <div class="mobile-content">
+            <h2>移动端优化中</h2>
+            <p>为了获得最佳游戏体验，建议您使用电脑访问</p>
+            <button onclick="hideMobileWarning()">继续游戏</button>
+        </div>
+    </div>
+    
+    <!-- Unity WebGL脚本 -->
+    <script src="{{{ LOADER_FILENAME }}}"></script>
+    
+    <!-- 游戏桥接脚本 -->
+    <script src="TemplateData/unity-bridge.js"></script>
+    
+    <!-- Safari兼容性脚本 -->
+    <script src="TemplateData/safari-compatibility.js"></script>
+    
+    <!-- 错误处理脚本 -->
+    <script src="TemplateData/error-handler.js"></script>
+    
+    <!-- 主初始化脚本 -->
+    <script>
+        // 全局配置
+        window.gameConfig = {
+            buildUrl: "Build",
+            loaderUrl: "Build/{{{ LOADER_FILENAME }}}",
+            dataUrl: "Build/{{{ DATA_FILENAME }}}",
+            frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
+            codeUrl: "Build/{{{ CODE_FILENAME }}}",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "{{{ COMPANY_NAME }}}",
+            productName: "{{{ PRODUCT_NAME }}}",
+            productVersion: "{{{ PRODUCT_VERSION }}}",
+            showBanner: unityShowBanner,
+        };
+
+        // Unity实例
+        var unityInstance = null;
+        var container = document.querySelector("#unity-container");
+        var canvas = document.querySelector("#unity-canvas");
+        var loadingBar = document.querySelector("#unity-loading-bar");
+        var progressBarFull = document.querySelector("#unity-progress-bar-full");
+        var progressText = document.querySelector("#unity-progress-text");
+        var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+
+        // 加载进度回调
+        function updateProgress(progress) {
+            progressBarFull.style.width = 100 * progress + "%";
+            progressText.textContent = Math.round(progress * 100) + "%";
+            
+            if (progress >= 1) {
+                setTimeout(function() {
+                    loadingBar.style.display = "none";
+                    fullscreenButton.style.display = "block";
+                }, 500);
+            }
+        }
+
+        // 错误处理回调
+        function onUnityError(error) {
+            console.error("Unity错误:", error);
+            
+            loadingBar.style.display = "none";
+            document.getElementById("error-container").style.display = "flex";
+            document.getElementById("error-message").textContent = error || "游戏加载失败，请重试";
+            
+            // 发送错误报告
+            if (window.errorHandler) {
+                window.errorHandler.reportError('unity_load_error', error);
+            }
+        }
+
+        // 初始化Unity
+        function initializeUnity() {
+            createUnityInstance(canvas, window.gameConfig, updateProgress)
+                .then((unity) => {
+                    unityInstance = unity;
+                    
+                    // 设置全屏按钮
+                    fullscreenButton.onclick = () => {
+                        unityInstance.SetFullscreen(1);
+                    };
+                    
+                    // 初始化游戏桥接
+                    if (window.unityBridge) {
+                        window.unityBridge.initialize(unityInstance);
+                    }
+                    
+                    // 游戏加载完成事件
+                    window.dispatchEvent(new Event('unity-ready'));
+                    
+                    console.log("Unity游戏初始化完成");
+                })
+                .catch((error) => {
+                    onUnityError(error);
+                });
+        }
+
+        // 移动端警告处理
+        function hideMobileWarning() {
+            document.getElementById("mobile-warning").style.display = "none";
+        }
+
+        // 检测移动端
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 移动端检测
+            if (isMobile()) {
+                container.className = "unity-mobile";
+                // 如果需要显示移动端警告，取消下面注释
+                // document.getElementById("mobile-warning").style.display = "flex";
+            }
+            
+            // Safari音频兼容性处理
+            if (window.safariCompatibility) {
+                window.safariCompatibility.initialize();
+            }
+            
+            // 错误处理初始化
+            if (window.errorHandler) {
+                window.errorHandler.initialize();
+            }
+            
+            // 延迟初始化Unity，确保所有脚本都已加载
+            setTimeout(initializeUnity, 100);
+        });
+
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', function() {
+            if (unityInstance) {
+                unityInstance.Quit();
+            }
+        });
+
+        // 窗口大小改变时调整画布
+        window.addEventListener('resize', function() {
+            if (unityInstance && !document.fullscreenElement) {
+                // 响应式调整逻辑
+                var containerRect = container.getBoundingClientRect();
+                var aspectRatio = {{{ WIDTH }}} / {{{ HEIGHT }}};
+                
+                var newWidth = containerRect.width;
+                var newHeight = newWidth / aspectRatio;
+                
+                if (newHeight > window.innerHeight * 0.9) {
+                    newHeight = window.innerHeight * 0.9;
+                    newWidth = newHeight * aspectRatio;
+                }
+                
+                canvas.style.width = newWidth + 'px';
+                canvas.style.height = newHeight + 'px';
+            }
+        });
+
+        // 全局错误捕获
+        window.addEventListener('error', function(event) {
+            console.error('页面错误:', event.error);
+            if (window.errorHandler) {
+                window.errorHandler.reportError('page_error', event.error?.message || '未知错误');
+            }
+        });
+
+        // URL参数解析 - 传递给Unity
+        function getUrlParams() {
+            var params = new URLSearchParams(window.location.search);
+            var gameParams = {};
+            
+            // 提取游戏参数
+            var paramNames = ['table_id', 'game_type', 'user_id', 'token', 'language', 'currency'];
+            paramNames.forEach(function(name) {
+                if (params.has(name)) {
+                    gameParams[name] = params.get(name);
+                }
+            });
+            
+            return gameParams;
+        }
+
+        // 向Unity发送URL参数
+        window.addEventListener('unity-ready', function() {
+            if (unityInstance) {
+                var urlParams = getUrlParams();
+                if (Object.keys(urlParams).length > 0) {
+                    unityInstance.SendMessage('GameManager', 'SetUrlParameters', JSON.stringify(urlParams));
+                }
+            }
+        });
+    </script>
+
+    <!-- Google Analytics 或其他分析脚本 -->
+    <!-- 
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    -->
+    
+</body>
+</html>

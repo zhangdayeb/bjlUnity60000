@@ -1,0 +1,417 @@
+{
+  "environments": {
+    "development": {
+      "name": "开发环境",
+      "description": "本地开发和测试环境",
+      "http": {
+        "baseUrl": "http://localhost:8080",
+        "timeout": 30000,
+        "retryAttempts": 3,
+        "retryDelay": 1000
+      },
+      "websocket": {
+        "url": "ws://localhost:8081/websocket",
+        "reconnectAttempts": 5,
+        "reconnectDelay": 2000,
+        "heartbeatInterval": 30000,
+        "connectionTimeout": 10000
+      },
+      "mock": {
+        "enabled": true,
+        "responseDelay": 500,
+        "errorRate": 0.1,
+        "networkLatency": 100
+      }
+    },
+    
+    "testing": {
+      "name": "测试环境", 
+      "description": "QA测试和集成测试环境",
+      "http": {
+        "baseUrl": "https://test-api.example.com",
+        "timeout": 25000,
+        "retryAttempts": 3,
+        "retryDelay": 1500
+      },
+      "websocket": {
+        "url": "wss://test-ws.example.com/websocket",
+        "reconnectAttempts": 5,
+        "reconnectDelay": 3000,
+        "heartbeatInterval": 30000,
+        "connectionTimeout": 15000
+      },
+      "mock": {
+        "enabled": false,
+        "responseDelay": 0,
+        "errorRate": 0,
+        "networkLatency": 0
+      }
+    },
+    
+    "staging": {
+      "name": "预发布环境",
+      "description": "生产前的最终测试环境",
+      "http": {
+        "baseUrl": "https://staging-api.example.com",
+        "timeout": 20000,
+        "retryAttempts": 2,
+        "retryDelay": 2000
+      },
+      "websocket": {
+        "url": "wss://staging-ws.example.com/websocket",
+        "reconnectAttempts": 3,
+        "reconnectDelay": 5000,
+        "heartbeatInterval": 25000,
+        "connectionTimeout": 10000
+      },
+      "mock": {
+        "enabled": false,
+        "responseDelay": 0,
+        "errorRate": 0,
+        "networkLatency": 0
+      }
+    },
+    
+    "production": {
+      "name": "生产环境",
+      "description": "正式生产环境",
+      "http": {
+        "baseUrl": "https://api.example.com",
+        "timeout": 15000,
+        "retryAttempts": 2,
+        "retryDelay": 2000
+      },
+      "websocket": {
+        "url": "wss://ws.example.com/websocket",
+        "reconnectAttempts": 3,
+        "reconnectDelay": 5000,
+        "heartbeatInterval": 25000,
+        "connectionTimeout": 8000
+      },
+      "mock": {
+        "enabled": false,
+        "responseDelay": 0,
+        "errorRate": 0,
+        "networkLatency": 0
+      }
+    }
+  },
+
+  "httpClient": {
+    "defaultHeaders": {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "User-Agent": "BaccaratGame/1.0.0 (Unity WebGL)",
+      "X-Client-Version": "1.0.0",
+      "X-Platform": "WebGL"
+    },
+    
+    "security": {
+      "enableSSL": true,
+      "validateCertificates": true,
+      "allowSelfSignedCerts": false
+    },
+    
+    "compression": {
+      "enabled": true,
+      "method": "gzip",
+      "threshold": 1024
+    },
+    
+    "caching": {
+      "enabled": false,
+      "maxAge": 300,
+      "maxSize": 10485760
+    },
+    
+    "rateLimit": {
+      "enabled": true,
+      "maxRequestsPerSecond": 10,
+      "maxRequestsPerMinute": 300,
+      "burstLimit": 20
+    }
+  },
+
+  "websocket": {
+    "protocols": ["baccarat-v1", "game-protocol"],
+    "compression": {
+      "enabled": true,
+      "method": "deflate"
+    },
+    
+    "messageQueue": {
+      "maxQueueSize": 1000,
+      "priorityLevels": 3,
+      "batchEnabled": false,
+      "batchSize": 10,
+      "batchTimeout": 100
+    },
+    
+    "authentication": {
+      "method": "bearer",
+      "tokenRefreshEnabled": true,
+      "tokenRefreshThreshold": 300
+    }
+  },
+
+  "apiEndpoints": {
+    "auth": {
+      "login": "/auth/login",
+      "logout": "/auth/logout", 
+      "refresh": "/auth/refresh",
+      "validate": "/auth/validate"
+    },
+    
+    "user": {
+      "profile": "/user/profile",
+      "balance": "/user/balance",
+      "history": "/user/history",
+      "preferences": "/user/preferences"
+    },
+    
+    "game": {
+      "tableInfo": "/baccarat/table/{tableId}",
+      "gameHistory": "/baccarat/history/{tableId}",
+      "placeBet": "/baccarat/bet",
+      "cancelBet": "/baccarat/bet/cancel",
+      "gameResult": "/baccarat/result/{gameId}"
+    },
+    
+    "system": {
+      "health": "/system/health",
+      "version": "/system/version",
+      "maintenance": "/system/maintenance",
+      "announcements": "/system/announcements"
+    }
+  },
+
+  "websocketMessages": {
+    "incoming": {
+      "gameStart": "game_start",
+      "gameEnd": "game_end", 
+      "countdown": "countdown",
+      "betAccepted": "bet_accepted",
+      "betRejected": "bet_rejected",
+      "gameResult": "game_result",
+      "balanceUpdate": "balance_update",
+      "tableUpdate": "table_update",
+      "systemMessage": "system_message",
+      "heartbeat": "heartbeat",
+      "error": "error"
+    },
+    
+    "outgoing": {
+      "placeBet": "place_bet",
+      "cancelBet": "cancel_bet",
+      "heartbeat": "heartbeat_response",
+      "subscribe": "subscribe",
+      "unsubscribe": "unsubscribe"
+    }
+  },
+
+  "errorHandling": {
+    "retryableErrors": [
+      "NetworkError",
+      "TimeoutError", 
+      "ServerError",
+      "ConnectionLost"
+    ],
+    
+    "fatalErrors": [
+      "AuthenticationError",
+      "InvalidTokenError",
+      "AccountBannedError",
+      "InsufficientFundsError"
+    ],
+    
+    "retryStrategy": {
+      "maxAttempts": 3,
+      "backoffMultiplier": 2.0,
+      "maxBackoffTime": 30000,
+      "jitter": true
+    }
+  },
+
+  "monitoring": {
+    "connectionMonitor": {
+      "enabled": true,
+      "checkInterval": 10000,
+      "timeoutThreshold": 5000,
+      "failureThreshold": 3,
+      "testUrls": [
+        "https://api.example.com/health",
+        "https://www.google.com",
+        "https://www.cloudflare.com"
+      ]
+    },
+    
+    "performanceMonitor": {
+      "enabled": true,
+      "sampleInterval": 5000,
+      "metricsToTrack": [
+        "responseTime",
+        "throughput",
+        "errorRate",
+        "connectionCount"
+      ]
+    },
+    
+    "healthCheck": {
+      "enabled": true,
+      "interval": 30000,
+      "endpoints": [
+        "/system/health",
+        "/system/status"
+      ]
+    }
+  },
+
+  "loadBalancing": {
+    "enabled": false,
+    "strategy": "round_robin",
+    "servers": [],
+    "healthCheckEnabled": true,
+    "failoverEnabled": true
+  },
+
+  "cdn": {
+    "enabled": true,
+    "baseUrl": "https://cdn.example.com",
+    "resources": {
+      "images": "/images",
+      "audio": "/audio",
+      "videos": "/videos",
+      "fonts": "/fonts"
+    },
+    "caching": {
+      "enabled": true,
+      "maxAge": 86400,
+      "etag": true
+    }
+  },
+
+  "proxy": {
+    "enabled": false,
+    "host": "",
+    "port": 8080,
+    "username": "",
+    "password": "",
+    "bypassList": []
+  },
+
+  "diagnostics": {
+    "enabled": true,
+    "logLevel": "info",
+    "enableNetworkLogs": true,
+    "enablePerformanceLogs": true,
+    "enableErrorLogs": true,
+    "maxLogEntries": 1000,
+    
+    "reporting": {
+      "enabled": false,
+      "endpoint": "/diagnostics/report",
+      "interval": 300000,
+      "includeSystemInfo": true,
+      "includePerformanceData": true
+    }
+  },
+
+  "webgl": {
+    "corsEnabled": true,
+    "allowCredentials": false,
+    "preflight": {
+      "maxAge": 86400,
+      "allowMethods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "allowHeaders": ["Content-Type", "Authorization", "X-Requested-With"]
+    },
+    
+    "safariWorkarounds": {
+      "enableWebSocketPolyfill": true,
+      "enableFetchPolyfill": true,
+      "maxConnectionPoolSize": 6
+    }
+  },
+
+  "security": {
+    "enableCSP": true,
+    "cspDirectives": {
+      "default-src": "'self'",
+      "connect-src": "'self' wss: https:",
+      "img-src": "'self' data: https:",
+      "media-src": "'self' https:",
+      "script-src": "'self' 'unsafe-eval'",
+      "style-src": "'self' 'unsafe-inline'"
+    },
+    
+    "encryption": {
+      "algorithm": "AES-256-GCM",
+      "keyRotationInterval": 86400
+    },
+    
+    "requestSigning": {
+      "enabled": false,
+      "algorithm": "HMAC-SHA256",
+      "includeTimestamp": true,
+      "timestampTolerance": 300
+    }
+  },
+
+  "fallback": {
+    "enabled": true,
+    "servers": [
+      {
+        "name": "backup-1",
+        "http": "https://backup1-api.example.com",
+        "websocket": "wss://backup1-ws.example.com/websocket"
+      },
+      {
+        "name": "backup-2", 
+        "http": "https://backup2-api.example.com",
+        "websocket": "wss://backup2-ws.example.com/websocket"
+      }
+    ],
+    "switchThreshold": 3,
+    "switchDelay": 5000
+  },
+
+  "testing": {
+    "mockResponses": {
+      "enabled": true,
+      "responseTemplates": {
+        "userInfo": {
+          "user_id": "test_user_123",
+          "balance": 10000.00,
+          "currency": "CNY",
+          "nickname": "测试用户",
+          "level": 1,
+          "vip_level": 0
+        },
+        "tableInfo": {
+          "id": 1,
+          "lu_zhu_name": "测试桌台",
+          "num_pu": 50,
+          "num_xue": 45,
+          "video_near": "https://example.com/video1.m3u8",
+          "video_far": "https://example.com/video2.m3u8",
+          "time_start": 1640995200,
+          "right_money_banker_player": 100000,
+          "right_money_tie": 800000
+        }
+      }
+    },
+    
+    "networkSimulation": {
+      "enabled": false,
+      "latency": {
+        "min": 50,
+        "max": 200,
+        "average": 100
+      },
+      "packetLoss": 0.01,
+      "bandwidth": {
+        "upload": 1000000,
+        "download": 5000000
+      }
+    }
+  }
+}

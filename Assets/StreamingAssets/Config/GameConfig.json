@@ -1,0 +1,346 @@
+{
+  "gameInfo": {
+    "gameVersion": "1.0.0",
+    "gameType": "baccarat",
+    "supportedLanguages": ["zh-CN", "en-US", "zh-TW"],
+    "defaultLanguage": "zh-CN",
+    "supportedCurrencies": ["CNY", "USD", "HKD"],
+    "defaultCurrency": "CNY"
+  },
+  
+  "environment": {
+    "currentEnvironment": "development",
+    "environments": {
+      "development": {
+        "name": "开发环境",
+        "useMockData": true,
+        "enableDebugLog": true,
+        "enablePerformanceMonitor": true,
+        "showDebugUI": true
+      },
+      "testing": {
+        "name": "测试环境", 
+        "useMockData": false,
+        "enableDebugLog": true,
+        "enablePerformanceMonitor": true,
+        "showDebugUI": false
+      },
+      "production": {
+        "name": "生产环境",
+        "useMockData": false,
+        "enableDebugLog": false,
+        "enablePerformanceMonitor": false,
+        "showDebugUI": false
+      }
+    }
+  },
+
+  "baccarat": {
+    "gameSettings": {
+      "minBetAmount": 10,
+      "maxBetAmount": 100000,
+      "defaultBetAmount": 100,
+      "maxTotalBet": 500000,
+      "bettingTimeLimit": 30,
+      "resultDisplayTime": 8,
+      "autoPlayEnabled": true,
+      "maxAutoPlayRounds": 100
+    },
+    
+    "chipValues": [10, 50, 100, 500, 1000, 5000, 10000, 50000],
+    "defaultChipValue": 100,
+    
+    "betTypes": {
+      "banker": {
+        "id": 1,
+        "name": "庄",
+        "englishName": "Banker",
+        "payout": 0.95,
+        "commission": 0.05,
+        "color": "#FF6B6B"
+      },
+      "player": {
+        "id": 2,
+        "name": "闲",
+        "englishName": "Player", 
+        "payout": 1.0,
+        "commission": 0.0,
+        "color": "#4ECDC4"
+      },
+      "tie": {
+        "id": 3,
+        "name": "和",
+        "englishName": "Tie",
+        "payout": 8.0,
+        "commission": 0.0,
+        "color": "#45B7D1"
+      },
+      "bankerPair": {
+        "id": 4,
+        "name": "庄对",
+        "englishName": "Banker Pair",
+        "payout": 11.0,
+        "commission": 0.0,
+        "color": "#96CEB4"
+      },
+      "playerPair": {
+        "id": 5,
+        "name": "闲对",
+        "englishName": "Player Pair",
+        "payout": 11.0,
+        "commission": 0.0,
+        "color": "#FFEAA7"
+      },
+      "bigSmall": {
+        "big": {
+          "id": 6,
+          "name": "大",
+          "englishName": "Big",
+          "payout": 0.54,
+          "commission": 0.0,
+          "color": "#DDA0DD"
+        },
+        "small": {
+          "id": 7,
+          "name": "小", 
+          "englishName": "Small",
+          "payout": 1.5,
+          "commission": 0.0,
+          "color": "#98D8C8"
+        }
+      }
+    },
+
+    "roadmaps": {
+      "beadRoad": {
+        "enabled": true,
+        "maxColumns": 6,
+        "maxRows": 6,
+        "colors": {
+          "banker": "#FF6B6B",
+          "player": "#4ECDC4", 
+          "tie": "#45B7D1"
+        }
+      },
+      "bigRoad": {
+        "enabled": true,
+        "maxColumns": 20,
+        "maxRows": 6,
+        "showTieMarks": true
+      },
+      "bigEyeRoad": {
+        "enabled": true,
+        "maxColumns": 20,
+        "maxRows": 6,
+        "colors": {
+          "red": "#FF6B6B",
+          "blue": "#4ECDC4"
+        }
+      },
+      "smallRoad": {
+        "enabled": true,
+        "maxColumns": 20,
+        "maxRows": 6
+      },
+      "cockroachRoad": {
+        "enabled": true,
+        "maxColumns": 20,
+        "maxRows": 6
+      }
+    },
+
+    "statistics": {
+      "enableStatistics": true,
+      "trackWinStreak": true,
+      "trackBetHistory": true,
+      "maxHistoryRecords": 1000,
+      "showPrediction": false,
+      "predictionAccuracy": 0.6
+    }
+  },
+
+  "ui": {
+    "theme": {
+      "primaryColor": "#1A1A2E",
+      "secondaryColor": "#16213E", 
+      "accentColor": "#E94560",
+      "backgroundColor": "#0F0F23",
+      "textColor": "#FFFFFF",
+      "successColor": "#4ECDC4",
+      "warningColor": "#FFEAA7",
+      "errorColor": "#FF6B6B"
+    },
+    
+    "animations": {
+      "enableAnimations": true,
+      "chipAnimationDuration": 0.8,
+      "cardFlipDuration": 1.2,
+      "resultAnimationDuration": 2.0,
+      "transitionDuration": 0.3,
+      "easeType": "easeOutQuart"
+    },
+    
+    "effects": {
+      "enableParticleEffects": true,
+      "enableSoundEffects": true,
+      "enableVibration": false,
+      "winningEffectDuration": 3.0,
+      "flashEffectDuration": 0.5
+    },
+    
+    "layout": {
+      "adaptiveLayout": true,
+      "minScreenWidth": 800,
+      "minScreenHeight": 600,
+      "aspectRatio": 1.777,
+      "safeAreaEnabled": true
+    }
+  },
+
+  "audio": {
+    "masterVolume": 0.8,
+    "musicVolume": 0.6,
+    "sfxVolume": 0.8,
+    "voiceVolume": 0.7,
+    "muteOnBackground": true,
+    "safariAudioFix": true,
+    
+    "soundEffects": {
+      "chipPlace": "chip_place.wav",
+      "chipRemove": "chip_remove.wav", 
+      "cardFlip": "card_flip.wav",
+      "gameStart": "game_start.wav",
+      "gameEnd": "game_end.wav",
+      "win": "win.wav",
+      "lose": "lose.wav",
+      "bigWin": "big_win.wav",
+      "countdown": "countdown.wav",
+      "button": "button_click.wav",
+      "error": "error.wav",
+      "notification": "notification.wav"
+    },
+    
+    "backgroundMusic": {
+      "lobby": "lobby_music.mp3",
+      "game": "game_music.mp3",
+      "volume": 0.4,
+      "loop": true,
+      "fadeInDuration": 2.0,
+      "fadeOutDuration": 1.0
+    }
+  },
+
+  "performance": {
+    "webgl": {
+      "targetFrameRate": 60,
+      "vsyncEnabled": true,
+      "antiAliasing": 2,
+      "textureQuality": "high",
+      "shadowQuality": "medium",
+      "enableGPUInstancing": true
+    },
+    
+    "mobile": {
+      "targetFrameRate": 30,
+      "batteryOptimization": true,
+      "thermalOptimization": true,
+      "reducedEffects": true
+    },
+    
+    "memory": {
+      "maxTextureSize": 2048,
+      "compressionEnabled": true,
+      "garbageCollectionMode": "incremental",
+      "poolingEnabled": true
+    }
+  },
+
+  "security": {
+    "tokenValidation": true,
+    "requestEncryption": false,
+    "antiCheat": {
+      "enabled": true,
+      "maxBetFrequency": 10,
+      "suspiciousPatternDetection": true,
+      "behaviorAnalysis": false
+    },
+    "dataProtection": {
+      "encryptLocalData": false,
+      "sessionTimeout": 3600,
+      "maxIdleTime": 1800
+    }
+  },
+
+  "features": {
+    "multiTable": {
+      "enabled": false,
+      "maxTables": 4
+    },
+    "socialFeatures": {
+      "chat": false,
+      "friendsList": false,
+      "achievements": false
+    },
+    "promotions": {
+      "enabled": true,
+      "showPopups": true,
+      "checkInterval": 300
+    },
+    "tutorials": {
+      "enabled": true,
+      "autoShow": true,
+      "skipEnabled": true
+    }
+  },
+
+  "analytics": {
+    "enabled": true,
+    "trackGameEvents": true,
+    "trackUserBehavior": true,
+    "trackPerformance": true,
+    "batchSize": 50,
+    "sendInterval": 30,
+    "retryAttempts": 3
+  },
+
+  "localization": {
+    "dateFormat": "YYYY-MM-DD",
+    "timeFormat": "HH:mm:ss",
+    "numberFormat": {
+      "decimalPlaces": 2,
+      "thousandsSeparator": ",",
+      "decimalSeparator": "."
+    },
+    "currencyFormat": {
+      "CNY": {
+        "symbol": "¥",
+        "position": "before",
+        "decimalPlaces": 2
+      },
+      "USD": {
+        "symbol": "$",
+        "position": "before", 
+        "decimalPlaces": 2
+      },
+      "HKD": {
+        "symbol": "HK$",
+        "position": "before",
+        "decimalPlaces": 2
+      }
+    }
+  },
+
+  "debug": {
+    "enableDebugPanel": true,
+    "showFPS": true,
+    "showMemoryUsage": true,
+    "showNetworkStatus": true,
+    "logLevel": "info",
+    "enableProfiler": false,
+    "captureScreenshots": false,
+    "mockDataOverride": {
+      "enabled": false,
+      "scenario": "normal"
+    }
+  }
+}

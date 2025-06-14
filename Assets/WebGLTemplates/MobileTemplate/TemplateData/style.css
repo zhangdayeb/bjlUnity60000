@@ -1,0 +1,562 @@
+/* ==========================================================================
+   WebGL百家乐游戏样式表
+   优化WebGL性能，支持Safari和移动端
+   ========================================================================== */
+
+/* 基础重置和字体 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 防止移动端缩放和滚动 */
+body {
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* Unity容器 */
+#unity-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: inherit;
+}
+
+#unity-container.unity-desktop {
+    width: 100%;
+    height: 100%;
+}
+
+#unity-container.unity-mobile {
+    width: 100%;
+    height: 100%;
+}
+
+/* Unity画布 */
+#unity-canvas {
+    background: transparent;
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    cursor: default;
+    
+    /* 硬件加速 */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+    
+    /* 防止选择和拖拽 */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    user-drag: none;
+    
+    /* 触摸优化 */
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 加载界面 */
+#unity-loading-bar {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1000;
+}
+
+#unity-logo {
+    width: 154px;
+    height: 130px;
+    background: transparent;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#unity-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+#unity-progress-bar-empty {
+    width: 300px;
+    height: 8px;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#unity-progress-bar-full {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #4ecdc4, #45b7d1);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+}
+
+#unity-progress-text {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 500;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 0.5px;
+}
+
+/* 全屏按钮 */
+#unity-fullscreen-button {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+    width: 48px;
+    height: 48px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 999;
+    display: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+#unity-fullscreen-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.05);
+}
+
+#unity-fullscreen-button::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    transform: translate(-50%, -50%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 24 24'%3E%3Cpath d='M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* 错误界面 */
+#error-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.error-content {
+    background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+    padding: 40px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 480px;
+    margin: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.error-content h2 {
+    color: #ff6b6b;
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.error-content p {
+    color: #ffffff;
+    font-size: 16px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+#retry-button {
+    background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+
+#retry-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(78, 205, 196, 0.3);
+}
+
+#retry-button:active {
+    transform: translateY(0);
+}
+
+/* 移动端警告 */
+#mobile-warning {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+}
+
+.mobile-content {
+    background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 90%;
+    margin: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.mobile-content h2 {
+    color: #ffeaa7;
+    font-size: 20px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.mobile-content p {
+    color: #ffffff;
+    font-size: 14px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+.mobile-content button {
+    background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+    color: #2d3436;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* WebGL不支持提示 */
+.webgl-not-supported {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+    padding: 40px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 480px;
+    margin: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.webgl-not-supported h2 {
+    color: #ff6b6b;
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.webgl-not-supported p {
+    color: #ffffff;
+    font-size: 16px;
+    margin-bottom: 15px;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 768px) {
+    #unity-container.unity-mobile {
+        width: 100vw;
+        height: 100vh;
+    }
+    
+    #unity-canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    
+    #unity-loading-bar {
+        padding: 20px;
+    }
+    
+    #unity-logo {
+        width: 120px;
+        height: 100px;
+        margin-bottom: 15px;
+    }
+    
+    #unity-progress-bar-empty {
+        width: 250px;
+        margin-bottom: 12px;
+    }
+    
+    #unity-progress-text {
+        font-size: 14px;
+    }
+    
+    #unity-fullscreen-button {
+        right: 10px;
+        bottom: 10px;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .error-content {
+        padding: 30px 20px;
+        margin: 15px;
+    }
+    
+    .error-content h2 {
+        font-size: 20px;
+    }
+    
+    .error-content p {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-height: 600px) {
+    #unity-loading-bar {
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    
+    .error-content {
+        padding: 25px;
+    }
+}
+
+/* Safari特殊优化 */
+@supports (-webkit-appearance: none) {
+    body {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    #unity-canvas {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+/* 高DPI屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    #unity-canvas {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* 动画定义 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+/* 加载动画 */
+.loading-shimmer {
+    animation: shimmer 2s infinite;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background-size: 200px 100%;
+    background-repeat: no-repeat;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* 性能优化类 */
+.gpu-accelerated {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+}
+
+.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.no-drag {
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    user-drag: none;
+}
+
+.no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+/* 工具类 */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+.fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+    /* 已经是深色主题，无需额外调整 */
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 打印样式 */
+@media print {
+    #unity-container {
+        display: none;
+    }
+    
+    body::after {
+        content: "此页面需要在浏览器中查看";
+        display: block;
+        text-align: center;
+        font-size: 18px;
+        margin-top: 50px;
+    }
+}
+
+/* 辅助功能 */
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    .error-content,
+    .mobile-content,
+    .webgl-not-supported {
+        border: 2px solid #ffffff;
+    }
+    
+    #unity-progress-bar-full {
+        background: #ffffff;
+    }
+}
+
+/* 焦点管理 */
+button:focus,
+#unity-fullscreen-button:focus {
+    outline: 2px solid #4ecdc4;
+    outline-offset: 2px;
+}
+
+/* 隐藏类 - 用于逐步显示内容 */
+.hide-until-loaded {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.show-when-loaded {
+    opacity: 1;
+}
