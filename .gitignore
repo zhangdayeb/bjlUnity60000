@@ -1,0 +1,301 @@
+# Unity项目 .gitignore 配置文件
+# 生成日期: 2025/6/14
+
+#==================== Unity 核心忽略文件 ====================
+
+# Unity生成的临时文件和缓存
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ibrary/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Unity自动生成的元数据缓存
+sysinfo.txt
+*.stackdump
+
+# Unity崩溃报告
+*_BurstDebugInformation_DoNotShip/
+
+#==================== 项目设置和配置 ====================
+
+# 项目设置（个人配置，不应共享）
+ProjectSettings/Packages/
+ProjectSettings/ProjectVersion.txt
+ProjectSettings/VFXManager.asset
+
+# 编辑器设置（个人偏好）
+UserSettings/
+.vsconfig
+
+#==================== Visual Studio / Visual Studio Code ====================
+
+# Visual Studio缓存文件
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# 编译输出
+*.dll
+*.exe
+*.pdb
+*.pdb.meta
+*.mdb
+*.mdb.meta
+
+# 项目文件
+*.csproj
+*.unityproj
+*.sln
+*.sw?
+*.tmp
+
+#==================== 操作系统相关 ====================
+
+# Windows
+Thumbs.db
+Thumbs.db.meta
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+
+# macOS
+.DS_Store
+.DS_Store.meta
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+.Trash-*
+
+#==================== Unity包管理器 ====================
+
+# Package Manager 锁定文件（可选择保留）
+Packages/packages-lock.json
+
+# 本地包缓存
+Packages/*/package.json.meta
+
+#==================== 构建相关 ====================
+
+# WebGL构建输出
+/[Bb]uild/
+/[Bb]uilds/
+*.log
+
+# 各平台构建文件
+/WebGLBuilds/
+/WindowsBuilds/
+/MacBuilds/
+/AndroidBuilds/
+/iOSBuilds/
+
+# Unity Cloud Build
+/cloudbuild/
+
+#==================== 资源和内容 ====================
+
+# 大型资源文件（根据需要调整）
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+
+# 高分辨率纹理源文件（保留压缩后的版本）
+*.psd
+*.ai
+*.tif
+*.tiff
+
+# 3D源文件（保留导入后的版本）
+*.max
+*.ma
+*.mb
+*.fbx.meta
+
+# 音频源文件（保留压缩后的版本）
+*.wav.meta
+*.aif
+*.aiff
+
+#==================== 开发工具和调试 ====================
+
+# Unity Profiler数据
+*.data
+profilerdata/
+
+# Unity Analytics
+UnityAnalyticsManager.asset
+UnityAnalyticsManager.asset.meta
+
+# Unity性能报告
+PerformanceReporting/
+
+# 单元测试结果
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+#==================== 版本控制系统 ====================
+
+# Git
+.git/
+.gitattributes
+
+# Mercurial
+.hg/
+.hgignore
+
+# SVN
+.svn/
+
+#==================== 网络和服务器 ====================
+
+# 服务器配置文件（包含敏感信息）
+**/config/production.json
+**/config/staging.json
+*.env
+*.env.local
+*.env.production
+*.env.staging
+
+# API密钥和令牌
+apikeys.txt
+tokens.txt
+secrets.json
+
+#==================== 自定义忽略（项目特定） ====================
+
+# 百家乐游戏特定
+/StreamingAssets/Logs/
+/StreamingAssets/Cache/
+
+# 开发时的测试文件
+/Assets/Testing/TempData/
+/Assets/Development/TestAssets/
+
+# 本地配置文件
+localconfig.json
+devconfig.json
+
+# 团队成员个人文件夹
+/Assets/Personal*/
+/Assets/Temp*/
+
+#==================== 第三方插件和工具 ====================
+
+# TextMeshPro
+/Assets/TextMesh Pro/
+
+# Unity UI Extensions (如果使用)
+/Assets/UI Extensions/
+
+# DOTween Pro (如果使用商业版)
+/Assets/Demigiant/
+
+# 其他商业插件
+/Assets/Plugins/Commercial/
+
+#==================== 移动平台特定 ====================
+
+# Android
+*.keystore
+*.jks
+/Assets/Plugins/Android/libs/
+/Assets/StreamingAssets/google-services.json
+
+# iOS
+/Assets/StreamingAssets/GoogleService-Info.plist
+*.mobileprovision
+*.p12
+
+#==================== 可选忽略（根据团队需求） ====================
+
+# 如果使用Git LFS管理大文件，可以忽略这些扩展名
+# *.png
+# *.jpg
+# *.jpeg
+# *.mp3
+# *.ogg
+# *.wav
+
+# 如果不希望共享编辑器布局
+/Assets/Editor/EditorLayout.asset
+/Assets/Editor/EditorLayout.asset.meta
+
+# 如果不希望共享输入设置
+/ProjectSettings/InputManager.asset
+
+#==================== 保留重要文件（明确不忽略） ====================
+
+# 确保这些重要文件不被忽略
+!Assets/
+!ProjectSettings/
+!Packages/manifest.json
+
+# 保留空文件夹的.gitkeep文件
+!.gitkeep
+
+#==================== 临时和缓存文件 ====================
+
+# 各种临时文件
+*.tmp
+*.bak
+*.cache
+*.log
+
+# Unity编辑器生成的文件
+*.booproj
+*.pidb
+*.unityproj
+
+# 崩溃转储
+*.dmp
+
+#==================== 网络测试和调试 ====================
+
+# 网络调试日志
+/Logs/NetworkDebug/
+/Logs/WebSocket/
+/Logs/HTTP/
+
+# 性能测试文件
+/ProfilerData/
+/PerformanceData/
+
+# Mock数据缓存
+/Assets/StreamingAssets/MockData/Cache/
+
+#==================== 文档和说明 ====================
+
+# 自动生成的文档
+/Documentation/Generated/
+/API Documentation/
+
+# 个人笔记
+notes.txt
+todo.md
+/Personal Notes/
+
+#==================== 结束 ====================
+
+# 注意：
+# 1. 如果需要忽略特定的大文件，建议使用 Git LFS
+# 2. 团队成员如果有特殊需求，可以使用 .git/info/exclude 文件
+# 3. 定期检查此文件，根据项目发展需要进行调整
+# 4. 在团队中统一 .gitignore 的使用标准
